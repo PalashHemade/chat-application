@@ -1,27 +1,47 @@
 .form {
   display: flex;
-  border-top: 2px solid #D3D3D3;
+  padding: 15px;
+  background: #16181d;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  align-items: center;
 }
 
 .input {
   border: none;
-  border-radius: 0;
-  padding: 5%;
-  width: 80%;
-  font-size: 1.2em;
+  border-radius: 20px;
+  padding: 12px 20px;
+  width: 100%;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  outline: none;
+  transition: background 0.3s ease;
 }
 
-input:focus, textarea:focus, select:focus{
-  outline: none;
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.input:focus {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .sendButton {
-  color: #fff !important;
+  color: #fff;
   text-transform: uppercase;
+  font-weight: 600;
   text-decoration: none;
-  background: #2979FF;
-  padding: 20px;
+  background: #4CAF50;
+  padding: 12px 24px;
+  border-radius: 20px;
   display: inline-block;
   border: none;
-  width: 20%;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sendButton:hover {
+  background: #43A047;
+  transform: translateY(-1px);
 }

@@ -1,12 +1,21 @@
 module.exports = {
   "extends": "airbnb",
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": [
+        "@babel/preset-react"
+      ]
+    }
+  },
   "env": {
     "browser": true,
     "node": true,
     "mocha": true
   },
   "rules": {
+    "linebreak-style": 0,
     "import/prefer-default-export": 0,
     "max-len": [
       2,

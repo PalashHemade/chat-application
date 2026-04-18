@@ -4,31 +4,33 @@ import './Message.css';
 
 import ReactEmoji from 'react-emoji';
 
-const Message = ({ message: { text, user }, name }) => {
+const Message = ({ message: { text, sender, createdAt }, name }) => {
   let isSentByCurrentUser = false;
 
   const trimmedName = name.trim().toLowerCase();
 
-  if(user === trimmedName) {
+  if(sender && sender.trim().toLowerCase() === trimmedName) {
     isSentByCurrentUser = true;
   }
+
+  const timeString = createdAt ? new Date(createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
     isSentByCurrentUser
       ? (
         <div className="messageContainer justifyEnd">
-          <p className="sentText pr-10">{trimmedName}</p>
-          <div className="messageBox backgroundBlue">
-            <p className="messageText colorWhite">{ReactEmoji.emojify(text)}</p>
+          <div className="messageBox backgroundGreen">
+            <p className="messageText colorWhite">{ReactEmoji.emojify(text || '')}</p>
+            <span className="timestamp">{timeString}</span>
           </div>
         </div>
         )
         : (
           <div className="messageContainer justifyStart">
-            <div className="messageBox backgroundLight">
-              <p className="messageText colorDark">{ReactEmoji.emojify(text)}</p>
+            <div className="messageBox backgroundGray">
+              <p className="messageText colorWhite">{ReactEmoji.emojify(text || '')}</p>
+              <span className="timestamp">{timeString}</span>
             </div>
-            <p className="sentText pl-10 ">{user}</p>
           </div>
         )
   );
