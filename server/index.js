@@ -19,35 +19,10 @@ const io = socketio(server, {
 
 app.use(cors());
 app.use(express.json());
-app.use(router);
+app.use('/api', router);
 
 mongoose.connect('mongodb://127.0.0.1:27017/chat_app').then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
-
-// API Routes
-app.get('/api/users', async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/messages/:user1/:user2', async (req, res) => {
-  try {
-    const { user1, user2 } = req.params;
-    const messages = await Message.find({
-      $or: [
-        { sender: user1, receiver: user2 },
-        { sender: user2, receiver: user1 }
-      ]
-    }).sort({ createdAt: 1 });
-    res.json(messages);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 // Socket Logic
 io.on('connect', (socket) => {
@@ -75,7 +50,7 @@ io.on('connect', (socket) => {
     }
   });
 
-  socket.on('sendMessage', async ({ receiver, text }, callback) => {
+  socket.on('sendMessage', async ({ receiver, text, isGroup, mediaBase64 }, callback) => {
     try {
       const senderUser = await User.findOne({ socketId: socket.id });
       if (!senderUser) return callback('Sender not found.');
@@ -83,23 +58,78 @@ io.on('connect', (socket) => {
       const message = new Message({
         sender: senderUser.name,
         receiver,
-        text
+        text,
+        isGroup: isGroup || false,
+        mediaBase64: mediaBase64 || ''
       });
       await message.save();
 
-      const receiverUser = await User.findOne({ name: receiver });
-
-      // Send to receiver if online
-      if (receiverUser && receiverUser.isOnline && receiverUser.socketId) {
-        io.to(receiverUser.socketId).emit('message', message);
+      if (isGroup) {
+        io.to(receiver).emit('message', message);
+      } else {
+        const receiverUser = await User.findOne({ name: receiver });
+        if (receiverUser && receiverUser.isOnline && receiverUser.socketId) {
+          io.to(receiverUser.socketId).emit('message', message);
+        }
+        socket.emit('message', message);
       }
-      // Send back to sender
-      socket.emit('message', message);
 
       if (callback) callback();
     } catch (err) {
       if (callback) callback(err.message);
     }
+  });
+
+  socket.on('typing', ({ receiver }) => {
+    User.findOne({ name: receiver }).then(user => {
+      if(user && user.isOnline) io.to(user.socketId).emit('typing', { sender: socket.id });
+    });
+  });
+
+  socket.on('stopTyping', ({ receiver }) => {
+    User.findOne({ name: receiver }).then(user => {
+      if(user && user.isOnline) io.to(user.socketId).emit('stopTyping');
+    });
+  });
+
+  socket.on('markAsRead', async ({ sender }) => {
+    // Current user read messages from sender
+    const currentUser = await User.findOne({ socketId: socket.id });
+    if(currentUser) {
+      await Message.updateMany(
+        { sender: sender, receiver: currentUser.name, status: { $ne: 'read' } },
+        { $set: { status: 'read' } }
+      );
+      const senderUser = await User.findOne({ name: sender });
+      if(senderUser && senderUser.isOnline) {
+        io.to(senderUser.socketId).emit('messagesRead', { reader: currentUser.name });
+      }
+    }
+  });
+
+  socket.on('deleteMessage', async ({ messageId }, callback) => {
+    try {
+      const message = await Message.findById(messageId);
+      if(message) {
+        message.isDeleted = true;
+        await message.save();
+        io.emit('messageDeleted', { messageId });
+      }
+      if(callback) callback();
+    } catch(err) {}
+  });
+
+  socket.on('editMessage', async ({ messageId, text }, callback) => {
+    try {
+      const message = await Message.findById(messageId);
+      if(message) {
+        message.text = text;
+        message.isEdited = true;
+        await message.save();
+        io.emit('messageEdited', { message });
+      }
+      if(callback) callback();
+    } catch(err) {}
   });
 
   socket.on('disconnect', async () => {

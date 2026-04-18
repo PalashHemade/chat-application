@@ -1,16 +1,9 @@
-html, body {
-  font-family: 'Inter', sans-serif;
-  padding: 0;
-  margin: 0;
-  background-color: #0f1115;
-}
-
 .outerContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #0f1115;
+  background: var(--bg-color);
   padding: 20px;
 }
 
@@ -19,46 +12,45 @@ html, body {
   width: 100%;
   max-width: 1200px;
   height: 100%;
-  background: #1a1c22;
+  background: var(--bg-secondary);
   border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
 }
 
 /* Sidebar Styles */
 .sidebar {
   width: 320px;
-  background: #16181d;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bg-color);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
 }
 
-.sidebarHeader {
+.top-bar {
   padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: var(--text-color);
 }
 
-.sidebarHeader h2 {
-  color: white;
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.currentUserInfo {
+.nav-links {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 6px 12px;
-  border-radius: 20px;
-  color: white;
-  font-size: 14px;
+  gap: 15px;
+}
+
+.nav-icon {
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.nav-icon:hover {
+  color: var(--accent-color);
 }
 
 .userList {
@@ -70,26 +62,31 @@ html, body {
   display: flex;
   align-items: center;
   padding: 15px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .userItem:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-secondary); /* A bit of contrast to bg-color */
+  filter: brightness(0.95);
+}
+
+.dark-theme .userItem:hover {
+  filter: brightness(1.2);
 }
 
 .userItem.selected {
-  background: rgba(76, 175, 80, 0.1);
-  border-left: 4px solid #4CAF50;
+  background: var(--accent-hover);
+  border-left: 4px solid var(--accent-color);
 }
 
 .userAvatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
-  color: white;
+  background: var(--accent-color);
+  color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -103,13 +100,13 @@ html, body {
 }
 
 .userName {
-  color: white;
+  color: var(--text-color);
   font-weight: 500;
   font-size: 15px;
 }
 
 .onlineText {
-  color: #4CAF50;
+  color: #2cb67d; /* Success Green */
   font-size: 12px;
   margin-top: 4px;
 }
@@ -117,20 +114,8 @@ html, body {
 .noUsers {
   padding: 20px;
   text-align: center;
-  color: #888;
+  color: var(--text-secondary);
   font-size: 14px;
-}
-
-.onlineIndicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #555;
-}
-
-.onlineIndicator.active {
-  background: #4CAF50;
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
 }
 
 /* Chat Area Styles */
@@ -138,27 +123,28 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #1a1c22;
+  background: var(--bg-secondary);
   position: relative;
 }
 
 .chatHeader {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background: #16181d;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .chatHeaderInfo h3 {
-  color: white;
+  color: var(--text-color);
   margin: 0 0 4px 0;
   font-size: 18px;
   font-weight: 600;
 }
 
 .chatHeaderInfo span {
-  color: #aaa;
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
@@ -168,20 +154,8 @@ html, body {
   justify-content: center;
   align-items: center;
   height: 100%;
-  color: #888;
+  color: var(--text-color);
   text-align: center;
-}
-
-.noChatSelected .placeholderIcon {
-  font-size: 64px;
-  margin-bottom: 20px;
-  opacity: 0.5;
-}
-
-.noChatSelected h2 {
-  color: #fff;
-  margin-bottom: 10px;
-  font-weight: 500;
 }
 
 @media (max-width: 768px) {
@@ -196,7 +170,7 @@ html, body {
     width: 100%;
     height: 40vh;
     border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
   }
   .chatArea {
     height: 60vh;
